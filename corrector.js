@@ -14,29 +14,54 @@
  that code without the copy of the GNU GPL normally required by
  section 4, provided you include this license notice and a URL
  through which recipients can access the Corresponding Source.
- */
+*/
 
-'use strict';
+function corrector(textContainer, is_eng, event) {
 
-function corrector(aim, is_eng) {
-    aim.value = aim.value
-        .replace(/(\.){4,}/g, "$1$1$1")
-        .replace(/([!?]){4,}/g, function(str) { return str.slice(0, 3); })
-        .replace(/([.,:;?!])(?!\1)/g, "$1 ")
-        .replace(/(\?|!) (?=\?|!)/g, "$1")
-        .replace(/[ \t]+/g, " ")
-        .replace(/(\s)-(\s)/g, "$1—$2")
-        .replace(/(^|\s)"/g, function(str, p1) { return is_eng ? p1 + "“" : p1 + "«"; })
-        .replace(/"(\s|[-.,:;?!]|$)/g, function(str, p1) { return is_eng ? "”" + p1 : "»" + p1; })
-        .replace(/\.\s\.\s\./g, "...")
-        .replace(/([a-zа-яё])\1+/gi, "$1$1")
-        .replace(/(\.{3}|[?!]|\.(?!\s*[a-zа-яё]\.))(\s)([a-zа-яё])/g, function(str, p1, p2, p3) { return p1 + p2 + p3.toUpperCase(); })
-        .replace(/\(c\)/gi, "©")
-        .replace(/\(R\)/g, "®")
-        .replace(/^([a-zа-яё])/, function(str, p1) { return p1.toUpperCase(); });
-}
+    'use strict';
 
-function trim(src) {
-    src = src.replace(/^\s+|\s+$/g, "");
-    return src;
+    var allow = 1;
+
+    // implementing trim() method to strings in cases when it's unsupported (unused at current time)
+    if (!String.prototype.trim) {
+        String.prototype.trim = function() {
+            return this.replace(/^\s*((?:.*\S)?)\s*$/, '$1');
+        };
+    }
+
+    // verify Event Object as an argument and
+    // do nothing if user presses Backspace to correct his input
+    allow = ((event || null) && event.keyCode == 8) ? 0 : 1;
+
+    if (allow) {
+        textContainer.value = textContainer.value
+            // replace unnecessary whitespace sequences with one whitespace
+            .replace(/[ \t]+/g, " ")
+            // replace sequence of more than three dots with three ones
+            .replace(/(\.){4,}/g, "$1$1$1")
+            // replace sequence of more than three question or exclamation marks with three ones
+            .replace(/[!?]{4,}/g, function(str) { return str.slice(0, 3); })
+            // remove whitespaces between question and exclamation marks
+            .replace(/(\?|!) (?=\?|!)/g, "$1")
+            // replace hyphen with a dash
+            .replace(/(\s)-(\s)/g, "$1—$2")
+            // replace left-side double quotes
+            .replace(/(^|\s)"/g, function(str, p1) { return is_eng ? p1 + "“" : p1 + "«"; })
+            // replace right-side double quotes
+            .replace(/"(\s|[-.,:;?!]|$)/g, function(str, p1) { return is_eng ? "”" + p1 : "»" + p1; })
+            // remove whitespaces between dots
+            .replace(/\.\s\.\s\./g, "...")
+            // adding single whitespace after comma, colon, semicolon and after each sentence before next one
+            .replace(/([.,:;])(?=[«“a-zа-яё\d])/gi, '$1 ')
+            // adding single whitespace after single ore more question or exclamation marks before the next sentence
+            .replace(/([!?])(?![!?”» ])/g, '$1 ')
+            // inserting real copyright symbol
+            .replace(/\([cс]\)/gi, "©")
+            // inserting real trade mark symbol
+            .replace(/\(r\)/gi, "®")
+            // capitalize first letter in the text
+            .replace(/^([a-zа-яё])/, function(str, p1) { return p1.toUpperCase(); })
+            // capitalize first letter in the sentence
+            .replace(/([.?!])(\s?)([a-zа-яё])/g, function(str, p1, p2, p3) { return p1 + p2 + p3.toUpperCase(); });
+    }
 }
