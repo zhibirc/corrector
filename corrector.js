@@ -14,7 +14,7 @@
  that code without the copy of the GNU GPL normally required by
  section 4, provided you include this license notice and a URL
  through which recipients can access the Corresponding Source.
-*/
+ */
 
 function corrector(textContainer, is_eng, event) {
 
