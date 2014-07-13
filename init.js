@@ -18,5 +18,5 @@ function addHandler(elem, event, callback) {
 function initEvents() {
     var textBox = document.getElementById('user_input');
     // you add corrector to element which you want and on the event which you want
-    addHandler(textBox, 'keyup', function() { corrector(textBox, false); });
+    addHandler(textBox, 'keyup', function(e) { corrector(textBox, false, e); });
 }
