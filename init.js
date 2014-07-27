@@ -4,14 +4,20 @@
     addHandler(window, 'load', initEvents);
 })();
 
-function addHandler(elem, event, callback) {
-    if (elem.addEventListener) {
-        elem.addEventListener(event, callback, false);
-    }
-    else if (elem.attachEvent) {
-        elem.attachEvent('on' + event, callback);
-    } else {
-        elem[event] = callback;
+// Event handlers universal installation
+function addHandler(elem, events, callback) {
+
+    events = events.split(' ');
+
+    for (var i = events.length - 1; i >= 0; i--) {
+        if (elem.addEventListener) {
+            elem.addEventListener(events[i], callback, false);
+        } else if (elem.attachEvent) {
+            // Fix correctly transferring 'this' in old IE
+            elem.attachEvent('on' + events[i], function() { callback.call(elem); });
+        } else {
+            elem['on' + events[i]] = callback;
+        }
     }
 }
 
