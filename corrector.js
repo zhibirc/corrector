@@ -56,7 +56,7 @@ function corrector(textContainer, is_eng, event) {
             // adding a thin whitespaces in initials and reductions
             .replace(/( [a-zа-яё]\.)\s?([a-zа-яё]\.)/gi, function(str, p1, p2) { return p1 + "\u2009" + p2; })
             // adding whitespace before each sentence in the given text
-            .replace(/(\.)(?=[a-zа-яё][^.])/g, '$1 ')
+            .replace(/(\.)(?=[a-zа-яё][^.])/gi, '$1 ')
             // adding single whitespace after single ore more question or exclamation marks before the next sentence
             .replace(/([!?])(?=[^!?”» ])/g, '$1 ')
             // inserting real copyright symbol
